@@ -5,3 +5,18 @@ Goal --- read data from file
 ##Asignments:
 
 
+a= (sin(dlat/2))^2 + cos(lat1) * cos(la2) * (sin(dlon/2))^2
+
+d=R(2 * atan2(sqrt(a),sqrt(1-a))
+
+R=67330000.0.0 m
+
+Var = var + (vi-vl)^2
+
+h, n subscript h, d with line over it subscript h, lowercase gamma
+
+start with
+h=1
+d subscript h=0.5
+
+gamma(h) = Sigma
