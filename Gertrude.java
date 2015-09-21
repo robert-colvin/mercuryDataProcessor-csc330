@@ -4,14 +4,20 @@ import java.lang.*;
 
 public class Gertrude 
 {
-	public static int n = 0;
-
+ 
+//MAKE A CLASS FOR LAG POINTS
 	public static void main(String[] args) 
 	{
 		double testy = 0.0;
+
 		ArrayList<Double> latitudes = new ArrayList<Double>();
 		ArrayList<Double> longitudes = new ArrayList<Double>();
 		ArrayList<Double> concentrations = new ArrayList<Double>();
+		//ArrayList<Pair> pointy = new ArrayList<Pair>();
+		int maxD = 769;
+		int pointsInLag = 0;
+		double totalD = 0.0;
+		double mercs = 0.0;
 		
 		try
 		{
@@ -25,36 +31,58 @@ public class Gertrude
 		        latitudes.add(Math.toRadians(Double.parseDouble(zeus.nextToken())));
 		        longitudes.add(Math.toRadians(Double.parseDouble(zeus.nextToken())));
 		        concentrations.add(Double.parseDouble(zeus.nextToken()));
-			n++;
 		        
 		    } 
-		    for (int i = 0; i < latitudes.size()-1; i++)
+		//MAX DISTANCE LOOP
+		    /*for (int i = 0; i < latitudes.size()-1; i++)
 		    {
 			for (int j = i+1; j < latitudes.size(); j++)
 			{
 				double compared = getDistance(latitudes.get(i), latitudes.get(j), longitudes.get(i), longitudes.get(j));
-				if (compared > testy)
+				if (compared > testy){
 					testy = compared;
+						xlat = latitudes.get(i);
+						xlong = longitudes.get(i);
+						ylat = latitudes.get(j);
+						ylong = longitudes.get(j);}
 			}
-			
-		    }
-			System.out.println(testy);
-		/*System.out.println(getDistance(37.0, 32.0, -122.0, -83.0));
-		System.out.println(getDistance(Math.toRadians(37.0), Math.toRadians(32.0), Math.toRadians(-122.0), 
-														Math.toRadians(-83.0)));
-		System.out.println(getDistance(32.8347, 33.7550, -83.6517, -84.3900));
-		System.out.println(getDistance(Math.toRadians(32.8347), Math.toRadians(33.7550), Math.toRadians(-83.6517), 
-														Math.toRadians(-84.3900)));*/
 
+		    }
+			System.out.println(testy);*/
 		}
 		catch (IOException ex) 
 		{
 		    System.out.println("WEB URL NOT FOUND.");
 		}
+			//CRAZY EXPERIMENTAL MATH GARBAGE
+
+		for (int lag = 0; lag <= maxD; lag++)
+		{
+			double semivariance = 0.0;
+			for (int i = 0; i < latitudes.size()-1;i++)
+			{
+				for (int j = i+1; j < latitudes.size();j++)
+				{
+					if ((double) lag - 0.5 <= getDistance(latitudes.get(i), latitudes.get(j), longitudes.get(i), longitudes.get(j)) 					&& getDistance(latitudes.get(i), latitudes.get(j), longitudes.get(i), longitudes.get(j)) <= (double) lag + 0.5)
+					{
+						mercs = Math.pow(concentrations.get(i)-concentrations.get(j), 2);
+						semivariance += mercs;
+						totalD += getDistance(latitudes.get(i), latitudes.get(j), longitudes.get(i), longitudes.get(j));
+						pointsInLag++;
+					}
+				}
+			}
+			System.out.println("The # of points in lag " + lag + " is " + pointsInLag);
+			System.out.println("The average distance between points in lag " + lag + " is " + totalD/pointsInLag);
+			semivariance = semivariance/(2*pointsInLag);
+			System.out.println("semivariance for this lag is " + semivariance);
+			System.out.println();
+
+			pointsInLag = 0;
+		}
 	}
 	public static double getDistance(Double lat1, Double lat2, Double long1, Double long2)
 	{
-		//lat1 = Math.toRadians
 		double r = 6373000.0;
 		double a = (Math.pow(Math.sin((lat1-lat2)/2), 2)) + Math.cos(lat1) * Math.cos(lat2) * (Math.pow(Math.sin((long1-long2)/2), 2));
 		double d = r * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));	
@@ -62,10 +90,6 @@ public class Gertrude
 		return d;
 
 	}
-	//CRAZY EXPERIMENTAL MATH GARBAGE
-	/*for (int i = 0; i < n; i++)
-	{
-		for (int j = i+1; 
-	}*/
+
 
 }
