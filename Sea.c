@@ -19,10 +19,7 @@ mercuryFile=fopen("mercurydata.csv","r");
 double Longitude[9999];
 double Latitude[9999];
 double Zee[9999];
-int Narray[9999];
-double SumArray[9999];
-
-char info[100000]; 
+char info[1000]; 
 char *pointer;
 char *end;
 double a=0;
@@ -37,7 +34,7 @@ double BigD=0;
 static int z=0;
 double lagMax=0.5;
 double lagMin=0.0;
-
+static double DistanceMatrix[3260][3260];
 	while (fscanf(mercuryFile,"%s", info)!=EOF){
 	pointer=strtok(info,", \n");
 		Latitude[c]=radionConvert(atof(pointer));
@@ -53,14 +50,28 @@ Longitude[c]= radionConvert(atof(pointer));
 
 //LEZ DO SOME MATH!
 
-
-
-do{
-n=0;
-Sum=0;
 int i=1;
 int j=i+1;
-iclone=i;
+do{
+j=i+1;
+do{
+if (j<c){
+double dlat=Latitude[i]-Latitude[j];
+		double dlong=Longitude[i]-Longitude[j];
+		a= pow(sin(dlat/2.0),2) + cos(Latitude[i]) * cos(Latitude[j]) * pow(sin(dlong/2.0),2);
+		d=r*(2 * atan2(sqrt(a),sqrt(1-a)));
+		if(d>BigD)
+		BigD=d;
+		DistanceMatrix[i][j]=d;
+}
+j++;
+
+}while(j<c);
+i++;
+}while(i<c);
+
+
+
 
 	do{
 	
@@ -76,17 +87,18 @@ iclone=i;
 		a= pow(sin(dlat/2.0),2) + cos(Latitude[iclone]) * cos(Latitude[j]) * pow(sin(dlong/2.0),2);
 		
 		d=r*(2 * atan2(sqrt(a),sqrt(1-a)));
-
+		
 	
-				if(j<c)
-				if(BigD<d)
-				BigD=d;
 				
-	
+				
+				
+	DistanceMatrix[iclone][j]=d;
 				
 				
 		if(d<=lagMax && d>=lagMin){
 		n=n+1;
+		
+				
 		}
 		j++;
 		
@@ -97,35 +109,31 @@ iclone=iclone+1;
 
 
 do{
-	
-	j=i+1;
-	
+n=0;
+Sum=0;
+int i=1;
+do{
+j=i+1;
+do{
+d=DistanceMatrix[i][j];
+if(d<=lagMax && d>=lagMin){
 
+Sum=Sum+pow((Zee[i]-Zee[j]),2);
 
-		do{
-		
-		
-		double dlat=Latitude[i]-Latitude[j];
-		double dlong=Longitude[i]-Longitude[j];
-		a= pow(sin(dlat/2.0),2) + cos(Latitude[i]) * cos(Latitude[j]) * pow(sin(dlong/2.0),2);
-		
-		d=r*(2 * atan2(sqrt(a),sqrt(1-a)));
+n++;}
+j++;
 
-				
-		if(d<=lagMax && d>=lagMin){
-		Sum=Sum+pow((Zee[i]-Zee[j]),2)/(2*(n+0.0));
-		}
-		j++;
-		
-		}while(j<c);
-	
+}while(j<c);
 i=i+1;
-}while(c>i);
-printf("%.10f\n",Sum);
+}while(i<c);
+Sum/=(2*(n+0.0));
+printf("%f\n",Sum);
 printf("%i\n",n);
+printf("\n");
+
 lagMin=lagMin+0.5;
 lagMax=lagMax+0.5;
-}while(n!=0); //This condition is wrong
+}while(BigD>lagMax); 
 
 }
 
