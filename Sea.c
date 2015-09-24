@@ -4,7 +4,7 @@
 #include <math.h>
 
 
-
+//Converts decimals to radians
 double radionConvert(double number){
 double result=(number*M_PI)/180.0;
 return result;
@@ -12,128 +12,122 @@ return result;
 
 int main(){ 
 
+//Set up a bunch of variables
 
-
+//File setup
 FILE *mercuryFile;
 mercuryFile=fopen("mercurydata.csv","r");
+//i and j loop variables
+int i=1;
+int j=i+1;
+
+//Variables for values read.
 double Longitude[9999];
 double Latitude[9999];
 double Zee[9999];
 char info[1000]; 
 char *pointer;
-char *end;
+
+//Variables that will be calculated
 double a=0;
-int n=0;
+int lagPoints=0;
 double d=0;
+
+//the constant 'r'
 double r= 6373000.0;
-int count=0;
+
+//a counter
 int c=0;
+
+//Sum of the data given at end of last loop 
 double Sum=0; 
-int iclone;
+
+//The biggest distance
 double BigD=0;
-static int z=0;
-double lagMax=0.5;
-double lagMin=0.0;
+
+//Total distance
+double dTotal=0;
+
+//Lag value
+int lagVal=0;
+
+//The distance matrix used to increase speed
 static double DistanceMatrix[3260][3260];
-	while (fscanf(mercuryFile,"%s", info)!=EOF){
+
+
+//Read in all values
+while (fscanf(mercuryFile,"%s", info)!=EOF){
 	pointer=strtok(info,", \n");
 		Latitude[c]=radionConvert(atof(pointer));
 	pointer=strtok(NULL,", \n");  
-  
-Longitude[c]= radionConvert(atof(pointer));
+	Longitude[c]= radionConvert(atof(pointer));
 	pointer=strtok(NULL,", \n"); 
 	Zee[c]=atof(pointer);
         c=c+1;
 
 	}
 
-
-//LEZ DO SOME MATH!
-
-int i=1;
-int j=i+1;
-do{
-j=i+1;
-do{
-if (j<c){
-double dlat=Latitude[i]-Latitude[j];
-		double dlong=Longitude[i]-Longitude[j];
-		a= pow(sin(dlat/2.0),2) + cos(Latitude[i]) * cos(Latitude[j]) * pow(sin(dlong/2.0),2);
-		d=r*(2 * atan2(sqrt(a),sqrt(1-a)));
-		if(d>BigD)
-		BigD=d;
-		DistanceMatrix[i][j]=d;
-}
-j++;
-
-}while(j<c);
-i++;
-}while(i<c);
-
-
-
-
+ i=1;
 	do{
 	
-	j=iclone+1;
+	 j=i+1;
 	
 
-
+		///Create distance matrix
 		do{
-		
-		
-		double dlat=Latitude[iclone]-Latitude[j];
-		double dlong=Longitude[iclone]-Longitude[j];
-		a= pow(sin(dlat/2.0),2) + cos(Latitude[iclone]) * cos(Latitude[j]) * pow(sin(dlong/2.0),2);
+		double dlat=Latitude[i]-Latitude[j];
+		double dlong=Longitude[i]-Longitude[j];
+		a= pow(sin(dlat/2.0),2) + cos(Latitude[i]) * cos(Latitude[j]) * pow(sin(dlong/2.0),2);
 		
 		d=r*(2 * atan2(sqrt(a),sqrt(1-a)));
-		
-	
+			if(j<c){
+				if(d>BigD)
+				BigD=d;
+			}	
 				
 				
+		DistanceMatrix[i][j]=d;
 				
-	DistanceMatrix[iclone][j]=d;
 				
-				
-		if(d<=lagMax && d>=lagMin){
-		n=n+1;
-		
-				
-		}
 		j++;
 		
 		}while(j<c);
 	
-iclone=iclone+1;
-}while(c>iclone);
+	i=i+1;
+	}while(c>i);
 
 
-do{
-n=0;
-Sum=0;
-int i=1;
-do{
-j=i+1;
-do{
-d=DistanceMatrix[i][j];
-if(d<=lagMax && d>=lagMin){
+	
+	//use matrix to calculate semivariance
 
-Sum=Sum+pow((Zee[i]-Zee[j]),2);
+	do{
+	lagPoints=0;
+	Sum=0;
+	 i=1;
+	dTotal=0;
+		do{
+		 j=i+1;
+			do{
+			d=DistanceMatrix[i][j];
+			
+			if(d<=lagVal+0.5 && d>=lagVal-0.5){
+			dTotal+=d;
+			Sum=Sum+pow((Zee[i]-Zee[j]),2);
+			lagPoints++;}
+		j++;
 
-n++;}
-j++;
+		}while(j<c);
 
-}while(j<c);
-i=i+1;
-}while(i<c);
-Sum/=(2*(n+0.0));
-printf("%f\n",Sum);
-printf("%i\n",n);
+	i=i+1;
+	}while(i<c);
+Sum/=(2*(lagPoints+0.0));
+printf(" The # of points in lag %i is %i \n",lagVal,lagPoints);
+printf("The average distance between points in lag %i is %f\n",lagVal,dTotal/(lagPoints+0.0));
+printf("The semivariance for this lag is %f\n",Sum);
 printf("\n");
 
-lagMin=lagMin+0.5;
-lagMax=lagMax+0.5;
-}while(BigD>lagMax); 
+lagVal++;
+}while(BigD+0.6>lagVal); 
 
 }
 
