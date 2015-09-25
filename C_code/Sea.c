@@ -66,7 +66,7 @@ while (fscanf(mercuryFile,"%s", info)!=EOF){
 
 	}
 
- i=1;
+ i=0;
 	do{
 	
 	 j=i+1;
@@ -103,7 +103,7 @@ while (fscanf(mercuryFile,"%s", info)!=EOF){
 	do{
 	lagPoints=0;
 	Sum=0;
-	 i=1;
+	 i=0;
 	dTotal=0;
 		do{
 		 j=i+1;
