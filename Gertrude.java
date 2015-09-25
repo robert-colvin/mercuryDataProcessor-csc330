@@ -55,14 +55,15 @@ public class Gertrude
 
 		//POPULATING THE DISTANCE MATRIX, HENCE THE NAME LONGNEO
 		double[][] longNeo = new double[latitudes.size()][latitudes.size()];
-		for (int i = 0; i < latitudes.size()-1;i++)
+
+		for (int i = 1; i < latitudes.size()-1;i++)
 		{
 			for (int j = i+1; j < latitudes.size(); j++)
 			{
 				longNeo[i][j] = getDistance(latitudes.get(i), latitudes.get(j), longitudes.get(i), longitudes.get(j));
 			}
 		}
-		//System.out.println(longNeo[0][0]);
+
 		//CALCULATE SEMIVARIANCE WITH SOME WILD EQUATION I CANT QUITE GRASP
 
 		for (int lag = 0; lag <= maxD; lag++)
@@ -81,18 +82,21 @@ public class Gertrude
 						totalD += longNeo[i][j];
 						pointsInLag++;
 					}
+
 				}
 			}	
 			
 			System.out.println("The # of points in lag " + lag + " is " + pointsInLag);
-			System.out.println("The average distance between points in lag " + lag + " is " + totalD/pointsInLag);
-			semivariance = semivariance/(2*pointsInLag);
+			System.out.println("The average distance between points in lag " + lag + " is " + totalD/(double)pointsInLag);
+			semivariance = semivariance/(2.0*pointsInLag);
 			System.out.println("semivariance for this lag is " + semivariance);
 			System.out.println();
 
+			totalD = 0.0;
 			pointsInLag = 0;
 		}
 	}
+
 	public static double getDistance(Double lat1, Double lat2, Double long1, Double long2)
 	{
 		double r = 6373000.0;
