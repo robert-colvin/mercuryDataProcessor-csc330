@@ -56,7 +56,7 @@ public class Gertrude
 		//POPULATING THE DISTANCE MATRIX, HENCE THE NAME LONGNEO
 		double[][] longNeo = new double[latitudes.size()][latitudes.size()];
 
-		for (int i = 1; i < latitudes.size()-1;i++)
+		for (int i = 0; i < latitudes.size()-1;i++)
 		{
 			for (int j = i+1; j < latitudes.size(); j++)
 			{
