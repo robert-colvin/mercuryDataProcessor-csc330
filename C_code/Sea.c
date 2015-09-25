@@ -1,5 +1,4 @@
 #include <stdio.h>
-<<<<<<< HEAD
 #include <string.h>
 #include <stdlib.h> 
 #include <math.h>
@@ -25,20 +24,19 @@ int j=i+1;
 //Variables for values read.
 double Longitude[9999];
 double Latitude[9999];
-double Zee[9999];
+double Zee[9999]; //Zee is the concentration value Array, named for being the z value in x,y,z as I didn't know what it was at the time.
 char info[1000]; 
 char *pointer;
 
 //Variables that will be calculated
 double a=0;
 int lagPoints=0;
-double d=0;
-
+double distance=0;
 //the constant 'r'
 double r= 6373000.0;
 
 //a counter
-int c=0;
+int count=0;
 
 //Sum of the data given at end of last loop 
 double Sum=0; 
@@ -59,16 +57,16 @@ static double DistanceMatrix[3260][3260];
 //Read in all values
 while (fscanf(mercuryFile,"%s", info)!=EOF){
 	pointer=strtok(info,", \n");
-		Latitude[c]=radionConvert(atof(pointer));
+		Latitude[count]=radionConvert(atof(pointer));
 	pointer=strtok(NULL,", \n");  
-	Longitude[c]= radionConvert(atof(pointer));
+	Longitude[count]= radionConvert(atof(pointer));
 	pointer=strtok(NULL,", \n"); 
-	Zee[c]=atof(pointer);
-        c=c+1;
+	Zee[count]=atof(pointer);
+        count=count+1;
 
 	}
 
- i=1;
+ i=0;
 	do{
 	
 	 j=i+1;
@@ -80,22 +78,23 @@ while (fscanf(mercuryFile,"%s", info)!=EOF){
 		double dlong=Longitude[i]-Longitude[j];
 		a= pow(sin(dlat/2.0),2) + cos(Latitude[i]) * cos(Latitude[j]) * pow(sin(dlong/2.0),2);
 		
-		d=r*(2 * atan2(sqrt(a),sqrt(1-a)));
-			if(j<c){
-				if(d>BigD)
-				BigD=d;
+		distance=r*(2 * atan2(sqrt(a),sqrt(1-a)));
+			//get biggest distance
+			if(j<count){
+				if(distance>BigD)
+				BigD=distance;
 			}	
 				
 				
-		DistanceMatrix[i][j]=d;
+		DistanceMatrix[i][j]=distance;
 				
 				
 		j++;
 		
-		}while(j<c);
+		}while(j<count);
 	
 	i=i+1;
-	}while(c>i);
+	}while(count>i);
 
 
 	
@@ -104,23 +103,24 @@ while (fscanf(mercuryFile,"%s", info)!=EOF){
 	do{
 	lagPoints=0;
 	Sum=0;
-	 i=1;
+	 i=0;
 	dTotal=0;
 		do{
 		 j=i+1;
 			do{
-			d=DistanceMatrix[i][j];
+			distance=DistanceMatrix[i][j];
 			
-			if(d<=lagVal+0.5 && d>=lagVal-0.5){
-			dTotal+=d;
+			if(distance<=lagVal+0.5 && distance>=lagVal-0.5){
+			dTotal+=distance;
 			Sum=Sum+pow((Zee[i]-Zee[j]),2);
-			lagPoints++;}
+			lagPoints++;
+			}
 		j++;
 
-		}while(j<c);
+		}while(j<count);
 
 	i=i+1;
-	}while(i<c);
+	}while(i<count);
 Sum/=(2*(lagPoints+0.0));
 printf(" The # of points in lag %i is %i \n",lagVal,lagPoints);
 printf("The average distance between points in lag %i is %f\n",lagVal,dTotal/(lagPoints+0.0));
@@ -132,18 +132,3 @@ lagVal++;
 
 }
 
-=======
-
-
-int main(){
-
-FILE *mercuryFile;
-mercuryFile=fopen("mercurydata.csv","r");
-char info[10000]; //When this was an ara it printed correc thins sort of
-
-while (fscanf(mercuryFile,"%s", info)!=EOF){
-
-printf("%s",info);   
-}
-}     
->>>>>>> master
